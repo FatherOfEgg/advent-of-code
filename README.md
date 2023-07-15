@@ -1,2 +1,1 @@
-# advent-of-code
-My Solutions for AOC
+My Solutions for AOC, and for now, it'll have Z80 solutions. I might do 6502 and C in the future.
