@@ -1,1 +1,3 @@
-This in theory should work, but I can't figure out why. If I step through the code line by line in Wabbitemu, everything is adding up correctly, but if I let it run without me stepping through, at some point it breaks.
+~~This in theory should work, but I can't figure out why. If I step through the code line by line in Wabbitemu, everything is adding up correctly, but if I let it run without me stepping through, at some point it breaks.~~
+
+Nevermind, I realized my mistake. While I was incrementing the pointer that points to the data just fine, I wasn't decrementing the length correctly. Additionally, my printTotal subroutine was accidentally overwriting the total square feet.

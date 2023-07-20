@@ -13,12 +13,6 @@ format ti executable 'D02P1'
 	ld (CurCol), a
 
 	call printTotal
-	ld hl, (totalSquareFt+2)
-	bcall _DispHL
-	bcall _NewLine
-	ld hl, (totalSquareFt)
-	bcall _DispHL
-	bcall _NewLine
 
 	call closeInput
 
@@ -26,7 +20,7 @@ format ti executable 'D02P1'
 
 printTotal:
 	ld hl, totalSquareFt
-	ld b, 8
+	ld b, 4
 	ld de, numberStringEnd - 1
 	ld c, $0F
 .loop:
@@ -51,7 +45,8 @@ printTotal:
 	inc hl
 	djnz .loop
 
-	ld hl, numberString
+	ex de, hl
+	inc hl
 	bcall _PutS
 	bcall _NewLine
 	ret
@@ -74,31 +69,25 @@ calcTotalSquareFt:
 	inc hl
 	ex de, hl
 .loop:
-	push bc
-
 	call atoi
 	ld (length), hl
 	call atoi
 	ld (width), hl
 	call atoi
-	ld (height), hl
-
-	push de
+	push bc, de
+	push hl		; Height
 
 	ld hl, (length)
 	ld de, (width)
-	ld bc, (height)
 
-	;	  L   W   H
-	push hl, de, bc
+	push de
 
 	; L x W
 	call multHLxDE
 	ld (smallestArea), de
 	call add2xAreaToTotal
 
-	;	 H   W
-	pop de, hl
+	pop hl, de
 	push de
 
 	; W x H
@@ -106,8 +95,8 @@ calcTotalSquareFt:
 	call updateSmallestArea
 	call add2xAreaToTotal
 
-	;	 H   L
-	pop de, hl
+	ld hl, (length)
+	pop de
 
 	; L x H
 	call multHLxDE
@@ -119,7 +108,6 @@ calcTotalSquareFt:
 	call addAreaToTotal
 
 	pop de, bc
-	dec bc
 	ld a, b
 	or c
 	jp nz, .loop
@@ -129,20 +117,23 @@ calcTotalSquareFt:
 ; Converts until 'x' or '\n'
 ; Input: DE = address of ascii to be converted
 ; Output: HL
-; Destroys: A, BC
+; Destroys: A
 atoi:
+	push bc
 	ld hl, 0
-	ld b, h
-	ld c, l
 .loop:
 	ld a, (de)
 	inc de
+
+	pop bc
+	dec bc
 	
 	cp 'x'
 	ret z
 	cp $0A	; New line
 	ret z
 
+	push bc
 	; Multiply HL by 10
 	add hl, hl	; HL * 2
 	ld b, h		; BC = HL * 2
@@ -199,17 +190,15 @@ multHLxDE:
 ; Destroys: A, HL
 updateSmallestArea:
 	ld hl, (smallestArea)
-	
 	or a
 	sbc hl, de
 	ret c		; Return if new area is not smaller
-
 	ld (smallestArea), de	; Store new small area
 	ret
 
 ; Input: DE = Area to be added to total
 ; Output: None
-; Destroys: A, HL, BC
+; Destroys: A, HL
 add2xAreaToTotal:
 	; Multiply current area by 2
 	ex de, hl
@@ -217,23 +206,18 @@ add2xAreaToTotal:
 	ex de, hl
 addAreaToTotal:
 	ld hl, (totalSquareFt)
-	ld bc, (totalSquareFt + 2)
-
 	add hl, de
-
 	ld (totalSquareFt), hl
 	ret nc
 
-	ld hl, 0
-	adc hl, bc
+	ld hl, (totalSquareFt + 2)
+	inc hl
 	ld (totalSquareFt + 2), hl
 	ret
 
 length:
 	dw 0
 width:
-	dw 0
-height:
 	dw 0
 smallestArea:
 	dw 0
