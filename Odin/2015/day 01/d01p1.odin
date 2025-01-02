@@ -1,4 +1,5 @@
-package main
+#+private file
+package d01
 
 import "core:fmt"
 import "core:os"
