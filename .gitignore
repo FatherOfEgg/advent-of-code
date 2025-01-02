@@ -2,3 +2,4 @@ template/
 *.8xp
 build.bat
 .vscode/
+*.exe
