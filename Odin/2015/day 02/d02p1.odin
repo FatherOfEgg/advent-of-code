@@ -1,4 +1,4 @@
-#+private
+#+private file
 package d02
 
 import "core:fmt"
